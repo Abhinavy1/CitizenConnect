@@ -127,7 +127,112 @@ const getAllUsers = async (req, res) => {
 
     }
 };
+
+// ================= PROMOTE USER =================
+
+const promoteUser = async (req, res) => {
+
+    try {
+
+        const user = await User.findById(req.params.id).select("-password");
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found."
+            });
+        }
+
+        if (user.role === "admin") {
+            return res.status(400).json({
+                success: false,
+                message: "Admin cannot be promoted."
+            });
+        }
+
+        if (user.role === "officer") {
+            return res.status(400).json({
+                success: false,
+                message: "User is already an officer."
+            });
+        }
+
+        user.role = "officer";
+
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "User promoted to officer successfully.",
+            data: user
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+// ================= DEMOTE USER =================
+
+const demoteUser = async (req, res) => {
+
+    try {
+
+        const user = await User.findById(req.params.id).select("-password");
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found."
+            });
+        }
+
+        if (user.role === "admin") {
+            return res.status(400).json({
+                success: false,
+                message: "Admin cannot be demoted."
+            });
+        }
+
+        if (user.role === "citizen") {
+            return res.status(400).json({
+                success: false,
+                message: "User is already a citizen."
+            });
+        }
+
+        user.role = "citizen";
+
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Officer demoted to citizen successfully.",
+            data: user
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
 module.exports = {
     getDashboard,
-    getAllUsers
+    getAllUsers,
+    promoteUser,
+    demoteUser
 };
