@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 
 const register = async (req, res) => {
     try {
+
         const { firstName, lastName, email, phone, password } = req.body;
 
         const existingUser = await User.findOne({
@@ -32,19 +33,21 @@ const register = async (req, res) => {
         const userResponse = user.toObject();
         delete userResponse.password;
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
             message: "Registration Successful",
             data: userResponse
         });
 
     } catch (error) {
+
         console.error(error);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Internal Server Error"
         });
+
     }
 };
 
@@ -69,6 +72,14 @@ const login = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: "User not found"
+            });
+        }
+
+        // Check if account is blocked
+        if (user.status === "blocked") {
+            return res.status(403).json({
+                success: false,
+                message: "Your account has been blocked. Please contact the administrator."
             });
         }
 
@@ -98,7 +109,7 @@ const login = async (req, res) => {
         const userResponse = user.toObject();
         delete userResponse.password;
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             message: "Login Successful",
             token,
@@ -109,7 +120,7 @@ const login = async (req, res) => {
 
         console.error(error);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Internal Server Error"
         });

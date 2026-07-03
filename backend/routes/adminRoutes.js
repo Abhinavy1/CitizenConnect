@@ -9,7 +9,10 @@ const {
     getDashboard,
     getAllUsers,
     promoteUser,
-    demoteUser
+    demoteUser,
+    blockUser,
+    unblockUser,
+    getAnalytics
 } = require("../controllers/adminController");
 
 // ================= ADMIN DASHBOARD =================
@@ -19,6 +22,15 @@ router.get(
     auth,
     authorizeRoles("admin"),
     getDashboard
+);
+
+// ================= ANALYTICS =================
+
+router.get(
+    "/analytics",
+    auth,
+    authorizeRoles("admin"),
+    getAnalytics
 );
 
 // ================= VIEW ALL USERS =================
@@ -46,6 +58,24 @@ router.put(
     auth,
     authorizeRoles("admin"),
     demoteUser
+);
+
+// ================= BLOCK USER =================
+
+router.put(
+    "/block/:id",
+    auth,
+    authorizeRoles("admin"),
+    blockUser
+);
+
+// ================= UNBLOCK USER =================
+
+router.put(
+    "/unblock/:id",
+    auth,
+    authorizeRoles("admin"),
+    unblockUser
 );
 
 module.exports = router;
