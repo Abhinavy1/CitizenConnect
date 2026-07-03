@@ -403,13 +403,196 @@ const getAnalytics = async (req, res) => {
     }
 
 };
+// ================= CATEGORY ANALYTICS =================
+
+const getCategoryAnalytics = async (req, res) => {
+
+    try {
+
+        const data = await Complaint.aggregate([
+            {
+                $group: {
+                    _id: "$category",
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { count: -1 }
+            }
+        ]);
+
+        return res.status(200).json({
+            success: true,
+            message: "Category analytics fetched successfully.",
+            data
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+// ================= PRIORITY ANALYTICS =================
+
+const getPriorityAnalytics = async (req, res) => {
+
+    try {
+
+        const data = await Complaint.aggregate([
+            {
+                $group: {
+                    _id: "$priority",
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { count: -1 }
+            }
+        ]);
+
+        return res.status(200).json({
+            success: true,
+            message: "Priority analytics fetched successfully.",
+            data
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+// ================= STATUS ANALYTICS =================
+
+const getStatusAnalytics = async (req, res) => {
+
+    try {
+
+        const data = await Complaint.aggregate([
+            {
+                $group: {
+                    _id: "$status",
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { count: -1 }
+            }
+        ]);
+
+        return res.status(200).json({
+            success: true,
+            message: "Status analytics fetched successfully.",
+            data
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+// ================= LOCATION ANALYTICS =================
+
+const getLocationAnalytics = async (req, res) => {
+
+    try {
+
+        const data = await Complaint.aggregate([
+            {
+                $group: {
+                    _id: "$location",
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { count: -1 }
+            }
+        ]);
+
+        return res.status(200).json({
+            success: true,
+            message: "Location analytics fetched successfully.",
+            data
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+// ================= MONTHLY ANALYTICS =================
+
+const getMonthlyAnalytics = async (req, res) => {
+
+    try {
+
+        const data = await Complaint.aggregate([
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$createdAt" },
+                        month: { $month: "$createdAt" }
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: {
+                    "_id.year": 1,
+                    "_id.month": 1
+                }
+            }
+        ]);
+
+        return res.status(200).json({
+            success: true,
+            message: "Monthly analytics fetched successfully.",
+            data
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
 
 module.exports = {
     getDashboard,
+    getAnalytics,
+
+    getCategoryAnalytics,
+    getPriorityAnalytics,
+    getStatusAnalytics,
+    getLocationAnalytics,
+    getMonthlyAnalytics,
+
     getAllUsers,
     promoteUser,
     demoteUser,
     blockUser,
-    unblockUser,
-    getAnalytics
+    unblockUser
 };

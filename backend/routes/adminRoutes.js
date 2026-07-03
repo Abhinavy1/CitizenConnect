@@ -7,15 +7,22 @@ const authorizeRoles = require("../middleware/roleMiddleware");
 
 const {
     getDashboard,
+    getAnalytics,
+
+    getCategoryAnalytics,
+    getPriorityAnalytics,
+    getStatusAnalytics,
+    getLocationAnalytics,
+    getMonthlyAnalytics,
+
     getAllUsers,
     promoteUser,
     demoteUser,
     blockUser,
-    unblockUser,
-    getAnalytics
+    unblockUser
 } = require("../controllers/adminController");
 
-// ================= ADMIN DASHBOARD =================
+// ================= DASHBOARD =================
 
 router.get(
     "/dashboard",
@@ -24,7 +31,7 @@ router.get(
     getDashboard
 );
 
-// ================= ANALYTICS =================
+// ================= OVERALL ANALYTICS =================
 
 router.get(
     "/analytics",
@@ -33,7 +40,52 @@ router.get(
     getAnalytics
 );
 
-// ================= VIEW ALL USERS =================
+// ================= CATEGORY ANALYTICS =================
+
+router.get(
+    "/analytics/category",
+    auth,
+    authorizeRoles("admin"),
+    getCategoryAnalytics
+);
+
+// ================= PRIORITY ANALYTICS =================
+
+router.get(
+    "/analytics/priority",
+    auth,
+    authorizeRoles("admin"),
+    getPriorityAnalytics
+);
+
+// ================= STATUS ANALYTICS =================
+
+router.get(
+    "/analytics/status",
+    auth,
+    authorizeRoles("admin"),
+    getStatusAnalytics
+);
+
+// ================= LOCATION ANALYTICS =================
+
+router.get(
+    "/analytics/location",
+    auth,
+    authorizeRoles("admin"),
+    getLocationAnalytics
+);
+
+// ================= MONTHLY ANALYTICS =================
+
+router.get(
+    "/analytics/monthly",
+    auth,
+    authorizeRoles("admin"),
+    getMonthlyAnalytics
+);
+
+// ================= USERS =================
 
 router.get(
     "/users",
