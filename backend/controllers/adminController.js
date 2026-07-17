@@ -1,0 +1,598 @@
+const User = require("../models/User");
+const Complaint = require("../models/Complaint");
+
+// ================= ADMIN DASHBOARD =================
+
+const getDashboard = async (req, res) => {
+
+    try {
+
+        const totalUsers = await User.countDocuments();
+
+        const totalCitizens = await User.countDocuments({
+            role: "citizen"
+        });
+
+        const totalOfficers = await User.countDocuments({
+            role: "officer"
+        });
+
+        const totalAdmins = await User.countDocuments({
+            role: "admin"
+        });
+
+        const totalComplaints = await Complaint.countDocuments();
+
+        const pendingComplaints = await Complaint.countDocuments({
+            status: "Pending"
+        });
+
+        const assignedComplaints = await Complaint.countDocuments({
+            status: "Assigned"
+        });
+
+        const inProgressComplaints = await Complaint.countDocuments({
+            status: "In Progress"
+        });
+
+        const resolvedComplaints = await Complaint.countDocuments({
+            status: "Resolved"
+        });
+
+        const rejectedComplaints = await Complaint.countDocuments({
+            status: "Rejected"
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Dashboard fetched successfully.",
+            data: {
+                totalUsers,
+                totalCitizens,
+                totalOfficers,
+                totalAdmins,
+                totalComplaints,
+                pendingComplaints,
+                assignedComplaints,
+                inProgressComplaints,
+                resolvedComplaints,
+                rejectedComplaints
+            }
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+// ================= GET ALL USERS =================
+
+const getAllUsers = async (req, res) => {
+    try {
+
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const search = req.query.search || "";
+        const role = req.query.role || "";
+
+        const filter = {};
+
+        if (search) {
+            filter.$or = [
+                { firstName: { $regex: search, $options: "i" } },
+                { lastName: { $regex: search, $options: "i" } },
+                { email: { $regex: search, $options: "i" } },
+                { phone: { $regex: search, $options: "i" } }
+            ];
+        }
+
+        if (role) {
+            filter.role = role;
+        }
+
+        const users = await User.find(filter)
+            .select("-password")
+            .skip(skip)
+            .limit(limit)
+            .sort({ createdAt: -1 });
+
+        const total = await User.countDocuments(filter);
+
+        return res.status(200).json({
+            success: true,
+            message: "Users fetched successfully.",
+            total,
+            page,
+            totalPages: Math.ceil(total / limit),
+            data: users
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+};
+
+// ================= PROMOTE USER =================
+
+const promoteUser = async (req, res) => {
+
+    try {
+
+        const user = await User.findById(req.params.id).select("-password");
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found."
+            });
+        }
+
+        if (user.role === "admin") {
+            return res.status(400).json({
+                success: false,
+                message: "Admin cannot be promoted."
+            });
+        }
+
+        if (user.role === "officer") {
+            return res.status(400).json({
+                success: false,
+                message: "User is already an officer."
+            });
+        }
+
+        user.role = "officer";
+
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "User promoted to officer successfully.",
+            data: user
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+// ================= DEMOTE USER =================
+
+const demoteUser = async (req, res) => {
+
+    try {
+
+        const user = await User.findById(req.params.id).select("-password");
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found."
+            });
+        }
+
+        if (user.role === "admin") {
+            return res.status(400).json({
+                success: false,
+                message: "Admin cannot be demoted."
+            });
+        }
+
+        if (user.role === "citizen") {
+            return res.status(400).json({
+                success: false,
+                message: "User is already a citizen."
+            });
+        }
+
+        user.role = "citizen";
+
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Officer demoted to citizen successfully.",
+            data: user
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+// ================= BLOCK USER =================
+
+const blockUser = async (req, res) => {
+
+    try {
+
+        const user = await User.findById(req.params.id).select("-password");
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found."
+            });
+        }
+
+        if (user.role === "admin") {
+            return res.status(400).json({
+                success: false,
+                message: "Admin cannot be blocked."
+            });
+        }
+
+        if (user.status === "blocked") {
+            return res.status(400).json({
+                success: false,
+                message: "User is already blocked."
+            });
+        }
+
+        user.status = "blocked";
+
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "User blocked successfully.",
+            data: user
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+// ================= UNBLOCK USER =================
+
+const unblockUser = async (req, res) => {
+
+    try {
+
+        const user = await User.findById(req.params.id).select("-password");
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found."
+            });
+        }
+
+        if (user.role === "admin") {
+            return res.status(400).json({
+                success: false,
+                message: "Admin cannot be unblocked."
+            });
+        }
+
+        if (user.status === "active") {
+            return res.status(400).json({
+                success: false,
+                message: "User is already active."
+            });
+        }
+
+        user.status = "active";
+
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "User unblocked successfully.",
+            data: user
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+// ================= ANALYTICS DASHBOARD =================
+
+const getAnalytics = async (req, res) => {
+
+    try {
+
+        const totalUsers = await User.countDocuments();
+
+        const totalCitizens = await User.countDocuments({
+            role: "citizen"
+        });
+
+        const totalOfficers = await User.countDocuments({
+            role: "officer"
+        });
+
+        const totalAdmins = await User.countDocuments({
+            role: "admin"
+        });
+
+        const totalComplaints = await Complaint.countDocuments();
+
+        const pendingComplaints = await Complaint.countDocuments({
+            status: "Pending"
+        });
+
+        const assignedComplaints = await Complaint.countDocuments({
+            status: "Assigned"
+        });
+
+        const inProgressComplaints = await Complaint.countDocuments({
+            status: "In Progress"
+        });
+
+        const resolvedComplaints = await Complaint.countDocuments({
+            status: "Resolved"
+        });
+
+        const rejectedComplaints = await Complaint.countDocuments({
+            status: "Rejected"
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Analytics fetched successfully.",
+            data: {
+                totalUsers,
+                totalCitizens,
+                totalOfficers,
+                totalAdmins,
+                totalComplaints,
+                pendingComplaints,
+                assignedComplaints,
+                inProgressComplaints,
+                resolvedComplaints,
+                rejectedComplaints
+            }
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+// ================= CATEGORY ANALYTICS =================
+
+const getCategoryAnalytics = async (req, res) => {
+
+    try {
+
+        const data = await Complaint.aggregate([
+            {
+                $group: {
+                    _id: "$category",
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { count: -1 }
+            }
+        ]);
+
+        return res.status(200).json({
+            success: true,
+            message: "Category analytics fetched successfully.",
+            data
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+// ================= PRIORITY ANALYTICS =================
+
+const getPriorityAnalytics = async (req, res) => {
+
+    try {
+
+        const data = await Complaint.aggregate([
+            {
+                $group: {
+                    _id: "$priority",
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { count: -1 }
+            }
+        ]);
+
+        return res.status(200).json({
+            success: true,
+            message: "Priority analytics fetched successfully.",
+            data
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+// ================= STATUS ANALYTICS =================
+
+const getStatusAnalytics = async (req, res) => {
+
+    try {
+
+        const data = await Complaint.aggregate([
+            {
+                $group: {
+                    _id: "$status",
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { count: -1 }
+            }
+        ]);
+
+        return res.status(200).json({
+            success: true,
+            message: "Status analytics fetched successfully.",
+            data
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+// ================= LOCATION ANALYTICS =================
+
+const getLocationAnalytics = async (req, res) => {
+
+    try {
+
+        const data = await Complaint.aggregate([
+            {
+                $group: {
+                    _id: "$location",
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { count: -1 }
+            }
+        ]);
+
+        return res.status(200).json({
+            success: true,
+            message: "Location analytics fetched successfully.",
+            data
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+// ================= MONTHLY ANALYTICS =================
+
+const getMonthlyAnalytics = async (req, res) => {
+
+    try {
+
+        const data = await Complaint.aggregate([
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$createdAt" },
+                        month: { $month: "$createdAt" }
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: {
+                    "_id.year": 1,
+                    "_id.month": 1
+                }
+            }
+        ]);
+
+        return res.status(200).json({
+            success: true,
+            message: "Monthly analytics fetched successfully.",
+            data
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+
+module.exports = {
+    getDashboard,
+    getAnalytics,
+
+    getCategoryAnalytics,
+    getPriorityAnalytics,
+    getStatusAnalytics,
+    getLocationAnalytics,
+    getMonthlyAnalytics,
+
+    getAllUsers,
+    promoteUser,
+    demoteUser,
+    blockUser,
+    unblockUser
+};
