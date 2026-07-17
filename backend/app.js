@@ -1,8 +1,8 @@
-const swaggerUi = require("swagger-ui-express");
-const swaggerSpec = require("./swagger");
-
 const express = require("express");
 const cors = require("cors");
+const swaggerUi = require("swagger-ui-express");
+
+const swaggerSpec = require("./swagger");
 
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -15,30 +15,93 @@ const errorHandler = require("./middleware/errorMiddleware");
 
 const app = express();
 
-app.use(cors());
+/*
+|--------------------------------------------------------------------------
+| CORS Configuration
+|--------------------------------------------------------------------------
+*/
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://citizen-connect-beryl.vercel.app",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests without an Origin header (Postman, mobile apps, etc.)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: [
+      "Origin",
+      "X-Requested-With",
+      "Content-Type",
+      "Accept",
+      "Authorization",
+    ],
+  })
+);
+
 app.use(express.json());
 
-// Swagger API Documentation
+/*
+|--------------------------------------------------------------------------
+| Swagger Documentation
+|--------------------------------------------------------------------------
+*/
+
 app.use(
-    "/api-docs",
-    swaggerUi.serve,
-    swaggerUi.setup(swaggerSpec)
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec)
 );
+
+/*
+|--------------------------------------------------------------------------
+| Logger Middleware
+|--------------------------------------------------------------------------
+*/
 
 app.use(logger);
 
+/*
+|--------------------------------------------------------------------------
+| Health Check
+|--------------------------------------------------------------------------
+*/
+
 app.get("/", (req, res) => {
-    res.json({
-        success: true,
-        message: "CitizenConnect API Running 🚀"
-    });
+  res.status(200).json({
+    success: true,
+    message: "CitizenConnect API Running 🚀",
+  });
 });
+
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+*/
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/complaints", complaintRoutes);
 app.use("/api/officer", officerRoutes);
 app.use("/api/admin", adminRoutes);
+
+/*
+|--------------------------------------------------------------------------
+| Error Handler
+|--------------------------------------------------------------------------
+*/
 
 app.use(errorHandler);
 

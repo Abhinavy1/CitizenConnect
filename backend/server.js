@@ -10,8 +10,8 @@ connectDB();
 
 // Start Server
 app.listen(PORT, () => {
-    console.log("==================================");
-    console.log("🚀 CitizenConnect Server Running");
-    console.log(`🌐 Server running on port ${PORT}`);
-    console.log("==================================");
+  console.log("==================================");
+  console.log("🚀 CitizenConnect Server Running");
+  console.log(`🌐 Server running on port ${PORT}`);
+  console.log("==================================");
 });
