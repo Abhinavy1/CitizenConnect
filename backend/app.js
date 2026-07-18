@@ -25,17 +25,14 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4173",
 
-  // Old Deployment
-  "https://citizen-connect-beryl.vercel.app",
-
-  // Current Deployment
-  "https://citizen-connect-d2ztpcsaz-abhinavy1s-projects.vercel.app",
+  // Vercel Frontend
+  "https://citizen-connect-sigma.vercel.app",
 ];
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests without Origin (Postman, mobile apps)
+    origin: (origin, callback) => {
+      // Allow Postman/server-to-server requests
       if (!origin) {
         return callback(null, true);
       }
@@ -44,22 +41,12 @@ app.use(
         return callback(null, true);
       }
 
-      console.log("Blocked by CORS:", origin);
-
+      console.log("❌ Blocked Origin:", origin);
       return callback(new Error("Not allowed by CORS"));
     },
 
     credentials: true,
-
-    methods: [
-      "GET",
-      "POST",
-      "PUT",
-      "PATCH",
-      "DELETE",
-      "OPTIONS",
-    ],
-
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: [
       "Origin",
       "X-Requested-With",
@@ -70,11 +57,26 @@ app.use(
   })
 );
 
+/*
+|--------------------------------------------------------------------------
+| Body Parser
+|--------------------------------------------------------------------------
+*/
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 /*
 |--------------------------------------------------------------------------
-| Swagger Documentation
+| Logger
+|--------------------------------------------------------------------------
+*/
+
+app.use(logger);
+
+/*
+|--------------------------------------------------------------------------
+| Swagger
 |--------------------------------------------------------------------------
 */
 
@@ -86,20 +88,12 @@ app.use(
 
 /*
 |--------------------------------------------------------------------------
-| Logger Middleware
-|--------------------------------------------------------------------------
-*/
-
-app.use(logger);
-
-/*
-|--------------------------------------------------------------------------
 | Health Check
 |--------------------------------------------------------------------------
 */
 
 app.get("/", (req, res) => {
-  res.status(200).json({
+  return res.status(200).json({
     success: true,
     message: "CitizenConnect API Running 🚀",
   });
@@ -107,7 +101,7 @@ app.get("/", (req, res) => {
 
 /*
 |--------------------------------------------------------------------------
-| API Routes
+| Routes
 |--------------------------------------------------------------------------
 */
 
@@ -116,6 +110,19 @@ app.use("/api/users", userRoutes);
 app.use("/api/complaints", complaintRoutes);
 app.use("/api/officer", officerRoutes);
 app.use("/api/admin", adminRoutes);
+
+/*
+|--------------------------------------------------------------------------
+| 404
+|--------------------------------------------------------------------------
+*/
+
+app.use((req, res) => {
+  return res.status(404).json({
+    success: false,
+    message: "Route Not Found",
+  });
+});
 
 /*
 |--------------------------------------------------------------------------
