@@ -1,14 +1,23 @@
 import { useState } from "react";
-import { User, Mail, Lock } from "lucide-react";
-import { Link } from "react-router-dom";
+import { User, Mail, Lock, Phone } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import Input from "../../../components/ui/Input";
 import Button from "../../../components/ui/Button";
 import SocialLogin from "./SocialLogin";
 
+import { registerUser } from "../../../services/authService";
+
 export default function RegisterForm() {
+  const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(false);
+
   const [form, setForm] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
+    phone: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -16,7 +25,7 @@ export default function RegisterForm() {
   });
 
   function handleChange(e) {
-    const { name, value, type, checked } = e.target;
+    const { name, value, checked, type } = e.target;
 
     setForm((prev) => ({
       ...prev,
@@ -24,56 +33,124 @@ export default function RegisterForm() {
     }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
-    console.log(form);
+    if (!form.firstName.trim()) {
+      return toast.error("First Name is required");
+    }
 
-    // Backend Integration Later
+    if (!form.lastName.trim()) {
+      return toast.error("Last Name is required");
+    }
+
+    if (!form.phone.trim()) {
+      return toast.error("Phone Number is required");
+    }
+
+    if (!form.email.trim()) {
+      return toast.error("Email is required");
+    }
+
+    if (!form.password.trim()) {
+      return toast.error("Password is required");
+    }
+
+    if (form.password !== form.confirmPassword) {
+      return toast.error("Passwords do not match");
+    }
+
+    if (!form.agree) {
+      return toast.error("Please accept Terms & Conditions");
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await registerUser({
+        firstName: form.firstName,
+        lastName: form.lastName,
+        phone: form.phone,
+        email: form.email,
+        password: form.password,
+      });
+
+      toast.success(response.data.message);
+
+      navigate("/login");
+
+    } catch (error) {
+      console.error(error);
+
+      toast.error(
+        error?.response?.data?.message ||
+          "Registration Failed"
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6"
+      className="space-y-5"
     >
       <Input
-        label="Full Name"
-        name="name"
-        placeholder="John Doe"
-        value={form.name}
+        label="First Name"
+        name="firstName"
+        value={form.firstName}
         onChange={handleChange}
-        leftIcon={<User size={20} />}
+        placeholder="Abhinav"
+        leftIcon={<User size={18} />}
+      />
+
+      <Input
+        label="Last Name"
+        name="lastName"
+        value={form.lastName}
+        onChange={handleChange}
+        placeholder="Kumar"
+        leftIcon={<User size={18} />}
+      />
+
+      <Input
+        label="Phone Number"
+        name="phone"
+        value={form.phone}
+        onChange={handleChange}
+        placeholder="9876543210"
+        leftIcon={<Phone size={18} />}
       />
 
       <Input
         label="Email Address"
         type="email"
         name="email"
-        placeholder="john@example.com"
         value={form.email}
         onChange={handleChange}
-        leftIcon={<Mail size={20} />}
+        placeholder="abc@gmail.com"
+        leftIcon={<Mail size={18} />}
       />
 
       <Input
         label="Password"
         type="password"
         name="password"
-        placeholder="Create Password"
         value={form.password}
         onChange={handleChange}
-        leftIcon={<Lock size={20} />}
+        placeholder="Create Password"
+        leftIcon={<Lock size={18} />}
       />
 
       <Input
         label="Confirm Password"
         type="password"
         name="confirmPassword"
-        placeholder="Confirm Password"
         value={form.confirmPassword}
         onChange={handleChange}
-        leftIcon={<Lock size={20} />}
+        placeholder="Confirm Password"
+        leftIcon={<Lock size={18} />}
       />
 
       <label className="flex items-start gap-3 text-slate-400">
@@ -87,27 +164,22 @@ export default function RegisterForm() {
 
         <span>
           I agree to the{" "}
-          <a
-            href="#"
-            className="text-cyan-400 hover:text-cyan-300"
-          >
+          <span className="text-cyan-400">
             Terms of Service
-          </a>{" "}
+          </span>{" "}
           and{" "}
-          <a
-            href="#"
-            className="text-cyan-400 hover:text-cyan-300"
-          >
+          <span className="text-cyan-400">
             Privacy Policy
-          </a>
+          </span>
         </span>
       </label>
 
       <Button
         type="submit"
         fullWidth
+        disabled={loading}
       >
-        Create Account
+        {loading ? "Creating Account..." : "Create Account"}
       </Button>
 
       <div className="relative">
@@ -128,7 +200,7 @@ export default function RegisterForm() {
         Already have an account?{" "}
         <Link
           to="/login"
-          className="font-semibold text-cyan-400 hover:text-cyan-300"
+          className="font-semibold text-cyan-400"
         >
           Login
         </Link>
