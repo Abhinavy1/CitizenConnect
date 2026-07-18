@@ -25,10 +25,10 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4173",
 
-  // Old Vercel Deployment
+  // Old Deployment
   "https://citizen-connect-beryl.vercel.app",
 
-  // Current Vercel Deployment
+  // Current Deployment
   "https://citizen-connect-d2ztpcsaz-abhinavy1s-projects.vercel.app",
 ];
 
@@ -69,9 +69,6 @@ app.use(
     ],
   })
 );
-
-// Handle preflight requests
-app.options("*", cors());
 
 app.use(express.json());
 
