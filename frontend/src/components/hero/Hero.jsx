@@ -31,3 +31,14 @@ export default function Hero() {
   );
 
 }
+
+
+export default function Hero() {
+  return (
+    <section className="flex h-[70vh] items-center justify-center">
+      <h2 className="text-6xl font-black">
+        Hero Section
+      </h2>
+    </section>
+  );
+}

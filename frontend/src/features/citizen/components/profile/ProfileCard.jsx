@@ -11,44 +11,45 @@ import {
 } from "lucide-react";
 
 export default function ProfileCard() {
+  const user = JSON.parse(localStorage.getItem("user"));
+
   const profile = {
-    name: "Abhinav Kumar",
-    email: "abhinav@example.com",
-    phone: "+91 98765 43210",
-    address: "Model Town, Jalandhar, Punjab",
-    aadhaar: "XXXX XXXX 4589",
-    level: "Gold Citizen",
-    reputation: "4.9 / 5.0",
+    name: user
+      ? `${user.firstName} ${user.lastName}`
+      : "Citizen",
+
+    email: user?.email || "Not Available",
+
+    phone: user?.phone || "Not Available",
+
+    address: user?.address || "Address Not Added",
+
+    aadhaar: user?.aadhaar || "Not Available",
+
+    level:
+      user?.role === "citizen"
+        ? "Verified Citizen"
+        : user?.role || "Verified Citizen",
+
+    reputation: "5.0 / 5.0",
   };
+
+  const initials = profile.name
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
 
   return (
     <motion.div
-      initial={{
-        opacity: 0,
-        y: 20,
-      }}
-      animate={{
-        opacity: 1,
-        y: 0,
-      }}
-      transition={{
-        duration: 0.4,
-      }}
-      className="
-        rounded-3xl
-        border
-        border-white/10
-        bg-slate-900
-        p-8
-        shadow-xl
-      "
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="rounded-3xl border border-white/10 bg-slate-900 p-8 shadow-xl"
     >
       {/* Avatar */}
-
       <div className="flex flex-col items-center">
-
         <div className="relative">
-
           <div
             className="
               flex
@@ -66,7 +67,7 @@ export default function ProfileCard() {
               shadow-xl
             "
           >
-            AK
+            {initials}
           </div>
 
           <button
@@ -87,7 +88,6 @@ export default function ProfileCard() {
               className="text-white"
             />
           </button>
-
         </div>
 
         <h2 className="mt-6 text-3xl font-black text-white">
@@ -108,17 +108,12 @@ export default function ProfileCard() {
           "
         >
           <BadgeCheck size={18} />
-
-          Verified Citizen
-
+          <span>{profile.level}</span>
         </div>
-
       </div>
 
       {/* Details */}
-
       <div className="mt-10 space-y-5">
-
         <InfoRow
           icon={Mail}
           label="Email"
@@ -154,17 +149,12 @@ export default function ProfileCard() {
           label="Reputation"
           value={profile.reputation}
         />
-
       </div>
     </motion.div>
   );
 }
 
-function InfoRow({
-  icon: Icon,
-  label,
-  value,
-}) {
+function InfoRow({ icon: Icon, label, value }) {
   return (
     <div
       className="
@@ -177,7 +167,6 @@ function InfoRow({
       "
     >
       <div className="flex items-center gap-3">
-
         <Icon
           size={20}
           className="text-cyan-400"
@@ -186,13 +175,11 @@ function InfoRow({
         <span className="text-slate-400">
           {label}
         </span>
-
       </div>
 
       <span className="font-semibold text-white">
         {value}
       </span>
-
     </div>
   );
 }

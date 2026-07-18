@@ -271,3 +271,13 @@ function Activity({
     </div>
   );
 }
+
+export default function DashboardPreview() {
+  return (
+    <section className="py-24 text-center">
+      <h2 className="text-4xl font-bold">
+        Dashboard Preview
+      </h2>
+    </section>
+  );
+}

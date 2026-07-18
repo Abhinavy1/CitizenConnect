@@ -1,37 +1,31 @@
-import { motion } from "framer-motion";
-import GlassCard from "../../../components/ui/GlassCard";
-
-function AuthCard({ title, subtitle, children }) {
+export default function AuthCard({
+  title,
+  subtitle,
+  children,
+}) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 25 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45 }}
-      className="w-full max-w-md"
+    <div
+      className="
+        rounded-[36px]
+        border
+        border-white/10
+        bg-slate-900/80
+        p-10
+        backdrop-blur-2xl
+        shadow-[0_25px_80px_rgba(0,0,0,.45)]
+      "
     >
-      <GlassCard hover={false} className="border-white/10">
+      <h1 className="text-4xl font-black text-white">
+        {title}
+      </h1>
 
-        <div className="mb-8">
+      <p className="mt-4 leading-7 text-slate-400">
+        {subtitle}
+      </p>
 
-          <div className="mb-3 inline-flex rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-400">
-            CitizenConnect
-          </div>
-
-          <h1 className="text-3xl font-bold text-white">
-            {title}
-          </h1>
-
-          <p className="mt-2 text-slate-400">
-            {subtitle}
-          </p>
-
-        </div>
-
+      <div className="mt-10">
         {children}
-
-      </GlassCard>
-    </motion.div>
+      </div>
+    </div>
   );
 }
-
-export default AuthCard;
