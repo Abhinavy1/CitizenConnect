@@ -1,5 +1,7 @@
 import axios from "axios";
 
+console.log("ENV URL:", import.meta.env.VITE_API_URL);
+
 const api = axios.create({
   baseURL:
     import.meta.env.VITE_API_URL ||
@@ -10,6 +12,8 @@ const api = axios.create({
   },
 });
 
+console.log("AXIOS BASE URL:", api.defaults.baseURL);
+
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -18,17 +22,15 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
+    console.log("➡️ Request URL:", config.baseURL + config.url);
+
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("token");

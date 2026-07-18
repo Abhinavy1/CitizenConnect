@@ -16,51 +16,13 @@ const errorHandler = require("./middleware/errorMiddleware");
 const app = express();
 
 /* =========================================
-   CORS Configuration
+   CORS Configuration (Temporary Debug Version)
 ========================================= */
-
- const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "http://localhost:4173",
-
-  "https://citizen-connect-sigma.vercel.app",
-];
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // Allow Postman, mobile apps, server-to-server
-      if (!origin) {
-        return callback(null, true);
-      }
-
-      // Allow localhost + production
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      // Allow ALL Vercel preview deployments
-      if (origin.endsWith(".vercel.app")) {
-        return callback(null, true);
-      }
-
-      console.log("❌ Blocked Origin:", origin);
-
-      return callback(new Error("Not allowed by CORS"));
-    },
-
+    origin: true,
     credentials: true,
-
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-
-    allowedHeaders: [
-      "Origin",
-      "X-Requested-With",
-      "Content-Type",
-      "Accept",
-      "Authorization",
-    ],
   })
 );
 
@@ -99,11 +61,11 @@ app.get("/", (req, res) => {
 });
 
 /* =========================================
-   Debug Routes
+   Debug Route
 ========================================= */
 
 app.get("/test", (req, res) => {
-  return res.json({
+  return res.status(200).json({
     success: true,
     message: "Server Working",
   });
