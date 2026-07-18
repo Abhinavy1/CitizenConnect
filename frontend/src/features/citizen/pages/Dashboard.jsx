@@ -1,75 +1,98 @@
 import DashboardLayout from "../components/layout/DashboardLayout";
 
-import StatsGrid from "../components/stats/StatsGrid";
-import ComplaintChart from "../components/charts/ComplaintChart";
-import ActivityTimeline from "../components/activity/ActivityTimeline";
-import QuickActions from "../components/actions/QuickActions";
-import OfficerStatus from "../components/officer/OfficerStatus";
-import AIInsights from "../components/ai/AIInsights";
-import RecentComplaints from "../components/complaints/RecentComplaints";
+import DashboardHeader from "../components/dashboard/DashboardHeader";
+import WelcomeBanner from "../components/dashboard/WelcomeBanner";
+import AnalyticsCards from "../components/dashboard/AnalyticsCards";
+import DashboardStats from "../components/dashboard/DashboardStats";
 
-export default function Dashboard() {
+import ComplaintChart from "../components/dashboard/ComplaintChart";
+import ComplaintPieChart from "../components/dashboard/ComplaintPieChart";
+import ComplaintStatusChart from "../components/dashboard/ComplaintStatusChart";
+
+import RecentComplaints from "../components/dashboard/RecentComplaints";
+import ActivityTimeline from "../components/dashboard/ActivityTimeline";
+
+import AIInsights from "../components/dashboard/AIInsights";
+import GovernmentAnnouncements from "../components/dashboard/GovernmentAnnouncements";
+
+import OfficerStatus from "../components/dashboard/OfficerStatus";
+import MapPreview from "../components/dashboard/MapPreview";
+
+import CitizenStats from "../components/dashboard/CitizenStats";
+import WeatherWidget from "../components/dashboard/WeatherWidget";
+import NewsTicker from "../components/dashboard/NewsTicker";
+import UpcomingEvents from "../components/dashboard/UpcomingEvents";
+
+import FloatingHelpButton from "../components/dashboard/FloatingHelpButton";
+
+const Dashboard = () => {
   return (
     <DashboardLayout>
+      <div className="min-h-screen bg-slate-50">
+        <div className="mx-auto max-w-7xl space-y-8 px-6 py-8">
+          {/* Header */}
+          <DashboardHeader />
 
-      {/* ========================= */}
-      {/* Statistics */}
-      {/* ========================= */}
+          {/* Welcome Banner */}
+          <WelcomeBanner />
 
-      <StatsGrid />
+          {/* Analytics */}
+          <AnalyticsCards />
 
-      {/* ========================= */}
-      {/* Analytics */}
-      {/* ========================= */}
+          {/* Statistics */}
+          <DashboardStats />
 
-      <div className="mt-8 grid gap-8 xl:grid-cols-3">
+          {/* Charts */}
+          <div className="grid gap-6 xl:grid-cols-3">
+            <div className="xl:col-span-2">
+              <ComplaintChart />
+            </div>
 
-        <div className="xl:col-span-2">
+            <ComplaintPieChart />
+          </div>
 
-          <ComplaintChart />
+          {/* Department Performance */}
+          <ComplaintStatusChart />
 
-        </div>
+          {/* AI Insights + Weather */}
+          <div className="grid gap-6 xl:grid-cols-3">
+            <div className="xl:col-span-2">
+              <AIInsights />
+            </div>
 
-        <div>
+            <WeatherWidget />
+          </div>
 
+          {/* Recent Complaints */}
+          <RecentComplaints />
+
+          {/* Timeline */}
           <ActivityTimeline />
 
-        </div>
+          {/* Officer + Map */}
+          <div className="grid gap-6 xl:grid-cols-2">
+            <OfficerStatus />
+            <MapPreview />
+          </div>
 
+          {/* Citizen Statistics */}
+          <CitizenStats />
+
+          {/* News */}
+          <NewsTicker />
+
+          {/* Government Announcements */}
+          <GovernmentAnnouncements />
+
+          {/* Upcoming Events */}
+          <UpcomingEvents />
+
+          {/* Floating AI Button */}
+          <FloatingHelpButton />
+        </div>
       </div>
-
-      {/* ========================= */}
-      {/* Quick Actions + Officers */}
-      {/* ========================= */}
-
-      <div className="mt-8 grid gap-8 xl:grid-cols-3">
-
-        <div className="xl:col-span-2">
-
-          <QuickActions />
-
-        </div>
-
-        <div>
-
-          <OfficerStatus />
-
-        </div>
-
-      </div>
-
-      {/* ========================= */}
-      {/* AI */}
-      {/* ========================= */}
-
-      <AIInsights />
-
-      {/* ========================= */}
-      {/* Recent Complaints */}
-      {/* ========================= */}
-
-      <RecentComplaints />
-
     </DashboardLayout>
   );
-}
+};
+
+export default Dashboard;
