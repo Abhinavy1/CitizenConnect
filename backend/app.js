@@ -23,23 +23,43 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:4173",
+
+  // Old Vercel Deployment
   "https://citizen-connect-beryl.vercel.app",
+
+  // Current Vercel Deployment
+  "https://citizen-connect-d2ztpcsaz-abhinavy1s-projects.vercel.app",
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests without an Origin header (Postman, mobile apps, etc.)
-      if (!origin) return callback(null, true);
+      // Allow requests without Origin (Postman, mobile apps)
+      if (!origin) {
+        return callback(null, true);
+      }
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
+      console.log("Blocked by CORS:", origin);
+
       return callback(new Error("Not allowed by CORS"));
     },
+
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS",
+    ],
+
     allowedHeaders: [
       "Origin",
       "X-Requested-With",
@@ -49,6 +69,9 @@ app.use(
     ],
   })
 );
+
+// Handle preflight requests
+app.options("*", cors());
 
 app.use(express.json());
 
